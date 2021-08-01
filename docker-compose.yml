@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: challenge_fullstack_app
+    entrypoint: dockerize -template ./.docker/app/.env:.env -wait tcp://postgresql:5432 -wait tcp://mysql:3306 -timeout 40s ./.docker/app/entrypoint.sh
+    tty: true
+    restart: always
+    environment:
+      JWT_SECRET: "RG9lIiwiaWF0IjoxNTE"
+      # Client 1
+      VAREJAO_DB_CONNECTION: "postgres"
+      VAREJAO_DB_HOST: "postgresql"
+      VAREJAO_DB_PORT: "5432"
+      VAREJAO_DB_USERNAME: "admin"
+      VAREJAO_DB_PASSWORD: "admin"
+      VAREJAO_DB_DATABASE: "challenge"
+      # Client 2
+      MACAPA_DB_CONNECTION: "mysql"
+      MACAPA_DB_HOST: "mysql"
+      MACAPA_DB_PORT: "3306"
+      MACAPA_DB_USERNAME: "admin"
+      MACAPA_DB_PASSWORD: "admin"
+      MACAPA_DB_DATABASE: "challenge"
+    ports:
+      - "5001:5000"
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+      - postgresql
+
+  mysql:
+    image: mysql
+    container_name: challenge_fullstack_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "challenge"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "admin"
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - app-network
+    volumes:
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
+
+  postgresql:
+    image: postgres
+    container_name: challenge_fullstack_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "challenge"
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_USER: "admin"
+    networks:
+      - app-network
+    volumes:
+      - ./.docker/postgresql:/docker-entrypoint-initdb.d
+
+volumes:
+  postgresql-volume:
+    driver: local
+  mysql-volume:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
