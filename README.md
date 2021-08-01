@@ -26,16 +26,13 @@
 
 Challenge to fullstack job.
 
-## Running the app
+## Running
 
 ```bash
-# development
 $ docker-compose up
 ```
 
-# Challenge
+## Api Documentation
 
-- [x] Docker
-- [x] Auth JWT
-- [x] Multi tenant database
+[https://documenter.getpostman.com/view/1086515/TzsfmQUS](https://documenter.getpostman.com/view/1086515/TzsfmQUS)
 
