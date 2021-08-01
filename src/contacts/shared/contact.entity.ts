@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
+import { validateOrReject } from 'class-validator';
 
 @Entity({ name: 'contacts' })
 export abstract class Contact {
@@ -16,5 +23,11 @@ export abstract class Contact {
   @BeforeInsert()
   async beforeInsert() {
     await this.transform();
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async validate() {
+    await validateOrReject(this);
   }
 }
